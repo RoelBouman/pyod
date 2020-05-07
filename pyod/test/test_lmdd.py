@@ -56,6 +56,10 @@ class TestCOF(unittest.TestCase):
         assert_true(hasattr(self.clf, 'random_state_') and
                     self.clf.random_state_ is not None)
 
+    def test_get_params(self):
+        assert_true(self.clf.get_params()["dis_measure"] is not None)
+        assert_true(self.clf.get_params()["n_iter"] is not None)
+
     def test_train_scores(self):
         assert_equal(len(self.clf.decision_scores_), self.X_train.shape[0])
 
