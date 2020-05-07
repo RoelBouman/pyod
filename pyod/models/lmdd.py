@@ -110,10 +110,10 @@ class LMDD(BaseDetector):
     def __init__(self, contamination=0.1, n_iter=50, dis_measure='aad',
                  random_state=None):
         super(LMDD, self).__init__(contamination=contamination)
-        self.random_state_, self.dis_measure_ = _check_params(n_iter,
+        self.random_state, self.dis_measure = _check_params(n_iter,
                                                               dis_measure,
                                                               random_state)
-        self.n_iter_ = n_iter
+        self.n_iter = n_iter
         self.decision_scores_ = None
 
     def fit(self, X, y=None):
@@ -167,7 +167,7 @@ class LMDD(BaseDetector):
         var_max, j = -np.inf, 0
         # this can be vectorized but just for comforting memory
         for i in range(1, X.shape[0]):
-            _var = self.dis_measure_(X[:i + 1]) - self.dis_measure_(X[:i])
+            _var = self.dis_measure(X[:i + 1]) - self.dis_measure(X[:i])
             if _var > var_max:
                 var_max = _var
                 j = i
@@ -177,10 +177,10 @@ class LMDD(BaseDetector):
 
         if var_max > 0:
             for k in range(j + 1, X.shape[0]):
-                dk_diff = (self.dis_measure_(
-                    np.vstack((X[:j], X[k]))) - self.dis_measure_(X[:j])) \
-                          - (self.dis_measure_(np.vstack((X[:j + 1], X[k])))
-                             - self.dis_measure_(X[:j + 1]))
+                dk_diff = (self.dis_measure(
+                    np.vstack((X[:j], X[k]))) - self.dis_measure(X[:j])) \
+                          - (self.dis_measure(np.vstack((X[:j + 1], X[k])))
+                             - self.dis_measure(X[:j + 1]))
                 if dk_diff >= var_max:
                     res_[k] = dk_diff
 
@@ -188,7 +188,7 @@ class LMDD(BaseDetector):
 
     def __sf(self, X):
         """Internal function to calculate for Smoothing Factors of data points
-        Repeated n_iter_ of times in randomized mode.
+        Repeated n_iter of times in randomized mode.
         """
         dis_ = np.zeros(shape=(X.shape[0],))
         card_ = np.zeros(shape=(X.shape[0],))
@@ -200,9 +200,9 @@ class LMDD(BaseDetector):
         # create a copy of random state to preserve original state for
         # future fits (if any)
         random_state = np.random.RandomState(
-            seed=self.random_state_.get_state()[1][0])
+            seed=self.random_state.get_state()[1][0])
         indices = np.arange(X.shape[0])
-        for _ in range(self.n_iter_):
+        for _ in range(self.n_iter):
             ind_ = indices
             random_state.shuffle(ind_)
             _x = X[indices]
