@@ -45,10 +45,13 @@ def _check_params(n_iter, dis_measure, random_state):
     else:
         raise TypeError("dis_measure should be str, got %s" % dis_measure)
 
+
+
+def _process_params(dis_measure, random_state):
     return check_random_state(random_state), _aad if dis_measure == 'aad' \
         else (np.var if dis_measure == 'var'
               else (stats.iqr if dis_measure == 'iqr' else None))
-
+    
 
 class LMDD(BaseDetector):
     """Linear Method for Deviation-based Outlier Detection.
@@ -132,9 +135,8 @@ class LMDD(BaseDetector):
         self : object
             Fitted estimator.
         """
-        self.random_state, self.dis_measure = _check_params(self.n_iter,
-                                                            self.dis_measure,
-                                                            self.random_state)        
+        _check_params(self.n_iter,self.dis_measure,self.random_state)
+        self.random_state, self._dis_measure_method = _process_params(self.dis_measure, self.random_state)
         
         
         X = check_array(X)
@@ -172,7 +174,7 @@ class LMDD(BaseDetector):
         var_max, j = -np.inf, 0
         # this can be vectorized but just for comforting memory
         for i in range(1, X.shape[0]):
-            _var = self.dis_measure(X[:i + 1]) - self.dis_measure(X[:i])
+            _var = self._dis_measure_method(X[:i + 1]) - self._dis_measure_method(X[:i])
             if _var > var_max:
                 var_max = _var
                 j = i
@@ -182,10 +184,10 @@ class LMDD(BaseDetector):
 
         if var_max > 0:
             for k in range(j + 1, X.shape[0]):
-                dk_diff = (self.dis_measure(
-                    np.vstack((X[:j], X[k]))) - self.dis_measure(X[:j])) \
-                          - (self.dis_measure(np.vstack((X[:j + 1], X[k])))
-                             - self.dis_measure(X[:j + 1]))
+                dk_diff = (self._dis_measure_method(
+                    np.vstack((X[:j], X[k]))) - self._dis_measure_method(X[:j])) \
+                          - (self._dis_measure_method(np.vstack((X[:j + 1], X[k])))
+                             - self._dis_measure_method(X[:j + 1]))
                 if dk_diff >= var_max:
                     res_[k] = dk_diff
 
