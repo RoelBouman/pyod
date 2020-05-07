@@ -110,10 +110,10 @@ class LMDD(BaseDetector):
     def __init__(self, contamination=0.1, n_iter=50, dis_measure='aad',
                  random_state=None):
         super(LMDD, self).__init__(contamination=contamination)
-        self.random_state, self.dis_measure = _check_params(n_iter,
-                                                              dis_measure,
-                                                              random_state)
+
         self.n_iter = n_iter
+        self.dis_measure = dis_measure
+        self.random_state = random_state
         self.decision_scores_ = None
 
     def fit(self, X, y=None):
@@ -132,6 +132,11 @@ class LMDD(BaseDetector):
         self : object
             Fitted estimator.
         """
+        self.random_state, self.dis_measure = _check_params(self.n_iter,
+                                                            self.dis_measure,
+                                                            self.random_state)        
+        
+        
         X = check_array(X)
         self._set_n_classes(y)
         self.decision_scores_ = self.decision_function(X)
