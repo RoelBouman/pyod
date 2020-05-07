@@ -49,12 +49,12 @@ class TestCOF(unittest.TestCase):
                     self.clf.labels_ is not None)
         assert_true(hasattr(self.clf, 'threshold_') and
                     self.clf.threshold_ is not None)
-        assert_true(hasattr(self.clf, 'dis_measure_') and
-                    self.clf.dis_measure_ is not None)
-        assert_true(hasattr(self.clf, 'n_iter_') and
-                    self.clf.n_iter_ is not None)
-        assert_true(hasattr(self.clf, 'random_state_') and
-                    self.clf.random_state_ is not None)
+        assert_true(hasattr(self.clf, 'dis_measure') and
+                    self.clf.dis_measure is not None)
+        assert_true(hasattr(self.clf, 'n_iter') and
+                    self.clf.n_iter is not None)
+        assert_true(hasattr(self.clf, 'random_state') and
+                    self.clf.random_state is not None)
 
     def test_get_params(self):
         assert_true(self.clf.get_params()["dis_measure"] is not None)
@@ -113,17 +113,23 @@ class TestCOF(unittest.TestCase):
         with assert_raises(ValueError):
             LMDD(contamination=10.)
         with assert_raises(ValueError):
-            LMDD(dis_measure='unknown')
+            clf_=LMDD(dis_measure='unknown')
+            clf_.fit(self.X_train)
         with assert_raises(TypeError):
-            LMDD(dis_measure=5)
+            clf_=LMDD(dis_measure=5)
+            clf_.fit(self.X_train)
         with assert_raises(TypeError):
-            LMDD(n_iter='not int')
+            clf_=LMDD(n_iter='not int')
+            clf_.fit(self.X_train)
         with assert_raises(ValueError):
-            LMDD(n_iter=-1)
+            clf_=LMDD(n_iter=-1)
+            clf_.fit(self.X_train)
         with assert_raises(ValueError):
-            LMDD(random_state='not valid')
+            clf_=LMDD(random_state='not valid')
+            clf_.fit(self.X_train)
         with assert_raises(ValueError):
-            LMDD(random_state=-1)
+            clf_=LMDD(random_state=-1)
+            clf_.fit(self.X_train)
 
     def tearDown(self):
         pass
