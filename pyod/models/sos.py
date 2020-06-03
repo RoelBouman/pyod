@@ -116,7 +116,7 @@ class SOS(BaseDetector):
                  eps=1e-5):
         super(SOS, self).__init__(contamination=contamination)
         self.perplexity = perplexity
-        self.metric = metric.lower()
+        self.metric = metric
         self.eps = eps
 
     def _x2d(self, X):
@@ -269,6 +269,7 @@ class SOS(BaseDetector):
         self : object
             Fitted estimator.
         """
+        self.metric = self.metric.lower()
         X = check_array(X)
         self._set_n_classes(y)
         D = self._x2d(X)
