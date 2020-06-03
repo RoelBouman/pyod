@@ -50,6 +50,10 @@ class TestSOS(unittest.TestCase):
                     self.clf.labels_ is not None)
         assert_true(hasattr(self.clf, 'threshold_') and
                     self.clf.threshold_ is not None)
+        
+    def test_get_params(self):
+        assert_true(self.clf.get_params()["perplexity"] is not None)
+        assert_true(self.clf.get_params()["metric"] is not None)
 
     def test_train_scores(self):
         assert_equal(len(self.clf.decision_scores_), self.X_train.shape[0])
