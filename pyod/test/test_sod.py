@@ -75,7 +75,10 @@ class TestSOD(unittest.TestCase):
                     self.clf.ref_set_ is not None)
         assert_true(hasattr(self.clf, 'n_neighbors_') and
                     self.clf.n_neighbors_ is not None)
-
+        
+    def test_get_params(self):
+        assert_true(self.clf.get_params()["n_neighbors"] is not None)
+          
     def test_train_scores(self):
         assert_equal(len(self.clf.decision_scores_), self.X_train.shape[0])
 
