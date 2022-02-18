@@ -7,12 +7,16 @@
 from __future__ import division
 from __future__ import print_function
 
+import warnings
+
 from sklearn.neighbors import kneighbors_graph
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils.validation import check_array
 
 from pyod.models.base import BaseDetector
 from pyod.utils.utility import invert_order
+
+from ..utils.utility import check_parameter
 
 import numpy as np
 
@@ -125,8 +129,22 @@ class ODIN(BaseDetector):
         """
         # validate inputs X and y (optional)
         X = check_array(X)
+        self.n_train_ = X.shape[0]
 
-        self.knn_graph_  = kneighbors_graph(X, n_neighbors=self.n_neighbors,
+        if self.n_neighbors >= self.n_train_:
+            self.n_neighbors_ = self.n_train_ - 1
+            warnings.warn(
+                "n_neighbors is set to the number of training points "
+                "minus 1: {0}".format(self.n_neighbors_))
+
+            check_parameter(self.n_neighbors_, 1, self.n_train_,
+                            include_left=True, include_right=True)
+        else:
+            self.n_neighbors_ = self.n_neighbors
+            check_parameter(self.n_neighbors_, 1, self.n_train_,
+                            include_left=True, include_right=True)
+
+        self.knn_graph_  = kneighbors_graph(X, n_neighbors=self.n_neighbors_,
                                             metric=self.metric,
                                             p=self.p,
                                             metric_params=self.metric_params,
@@ -136,7 +154,7 @@ class ODIN(BaseDetector):
         
         
         
-
+        self._set_n_classes(y)
         # Invert decision_scores_. Outliers comes with higher outlier scores
         self.decision_scores_ = invert_order(np.asarray(np.sum(self.knn_graph_, axis=0)).flatten())
         self._process_decision_scores()
@@ -174,5 +192,6 @@ class ODIN(BaseDetector):
                                             include_self=False)   
         
         # Invert decision_scores_. Outliers comes with higher outlier scores
-        self.decision_scores_ = invert_order(np.asarray(np.sum(self.knn_graph_, axis=0)).flatten())
-        self._process_decision_scores()
+        return invert_order(np.asarray(np.sum(self.knn_graph_, axis=0)).flatten())
+        
+        
