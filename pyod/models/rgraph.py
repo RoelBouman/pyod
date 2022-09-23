@@ -486,10 +486,12 @@ class RGraph(BaseDetector):
                                                                         'maxiter': self.maxiter}
                                                  )
 
-        self.transition_matrix_ = normalize(np.abs(A.toarray()), norm='l1')
+        self.transition_matrix_ = normalize(np.abs(A), norm='l1')
 
-        pi = np.ones((1, len(self.transition_matrix_)), dtype='float64') / len(self.transition_matrix_)
-        pi_bar = np.zeros((1, len(self.transition_matrix_)), dtype='float64')
+        n = self.transition_matrix_.shape[0]
+
+        pi = np.ones((1,n), dtype='float64') / n
+        pi_bar = np.zeros((1, n), dtype='float64')
 
         # Do transition steps
         for _ in range(self.transition_steps):
